@@ -1,0 +1,20 @@
+# /etc/systemd/system/daftar1-worker.service
+
+[Unit]
+Description=Laravel Queue Worker for Daftar 1 Digital
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=3
+WorkingDirectory=/var/www/daftar1-lebakwangi/backend
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+StandardOutput=append:/var/log/daftar1/worker.log
+StandardError=append:/var/log/daftar1/worker-error.log
+Environment=APP_ENV=production
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Console;
+
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
+class Kernel extends ConsoleKernel
+{
+    /**
+     * Define the application's command schedule.
+     */
+    protected function schedule(Schedule $schedule): void
+    {
+        // Send reminder based on days to month end
+        $schedule->call(function () {
+            \App\Services\ReportDeadlineService::sendRemindersByMonthEnd();
+        })->dailyAt('09:00');
+
+        // Send overdue notification on 1st of next month
+        $schedule->call(function () {
+            \App\Services\ReportDeadlineService::sendOverdueNotifications();
+        })->dailyAt('08:00');
+
+        // Auto backup database daily
+        $schedule->command('backup:run')->dailyAt('02:00');
+    }
+
+    /**
+     * Register the commands for the application.
+     */
+    protected function commands(): void
+    {
+        $this->load(__DIR__.'/Commands');
+        
+        require base_path('routes/console.php');
+    }
+}
